@@ -1,11 +1,13 @@
 import logging
+import os
 from datetime import datetime, timedelta
-
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
 
 # 🔑 Налаштування бота
-BOT_TOKEN = "8452151174:AAFPlZ7WXaUMoefoSzHru1SVShHJ_TwTdwc"  # твій токен
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+if not BOT_TOKEN:
+    raise RuntimeError('BOT_TOKEN не задан')
 ADMIN_ID = 869393770  # твій ID
 COOLDOWN_MINUTES = 5
 
@@ -21,7 +23,6 @@ logger = logging.getLogger(__name__)
 
 # 🧩 Приклад анкети
 EXAMPLE_ANKETA = """Приклад правильної анкети:
-
 Ім'я:
 Вік:
 Місто:
@@ -36,12 +37,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [KeyboardButton("Створити анкету")],
         [KeyboardButton("Чому мою анкету не виклали?")],
-        [KeyboardButton("Зв’язатися з адміністрацією")]
+        [KeyboardButton("Зв'язатися з адміністрацією")]
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
-
     await update.message.reply_html(
-        rf"Привіт, <b>{user.first_name or 'друже'}</b>! ❤️ Ласкаво просимо до бота каналу "
+        rf"Привіт, {user.first_name or 'друже'}! ❤️ Ласкаво просимо до бота каналу "
         "«Шукаю інтернет друга/подругу». Тут ти швидко створиш анкету й опинишся в нашій дружній спільноті! ✨\n\n"
         "Натискай «Створити анкету», заповнюй приклад і відправляй мені. Я все акуратно передам адміну.😊",
         reply_markup=reply_markup
@@ -71,14 +71,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == "Чому мою анкету не виклали?":
         await update.message.reply_text(
             "Усі причини та поради описані тут: https://uafriends.netlify.app/ 📚\n"
-            "Якщо щось не ясно — натисни «Зв’язатися з адміністрацією» 💬"
+            "Якщо щось не ясно — натисни «Зв'язатися з адміністрацією» 💬"
         )
         return
 
-    if text == "Зв’язатися з адміністрацією":
+    if text == "Зв'язатися з адміністрацією":
         await update.message.reply_text(
             "Є питання або ідеї? Пиши сюди 👉 @Pidtrimkaanket_bot 💌\n"
-            "Ми на зв’язку і завжди раді допомогти! ✨"
+            "Ми на зв'язку і завжди раді допомогти! ✨"
         )
         return
 
@@ -111,7 +111,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Дякуємо! 🌟 Анкету отримано і передано на модерацію. "
         "Слідкуй за каналом — скоро побачиш себе у каналі! 💙"
     )
-
     # оновлюємо час останнього «значущого» повідомлення
     user_last_message[user_id] = now
 
